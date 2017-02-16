@@ -27,14 +27,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         newsRecyclerView = (RecyclerView) findViewById(R.id.news_recycler_view);
         newsRecyclerView.setHasFixedSize(true);
-        linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        newsRecyclerView.setLayoutManager(linearLayoutManager);
         newsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        new RetrieveFeedTask().execute("http://www.dnevnik.bg/rss/?page=index");
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        newsRecyclerView.setLayoutManager(linearLayoutManager);
 
+        newsRecyclerAdapter = new NewsRecyclerAdapter(new ArrayList<RssItem>());
+        newsRecyclerView.setAdapter(newsRecyclerAdapter);
+
+        new RetrieveFeedTask().execute("http://www.dnevnik.bg/rss/?page=index");
     }
 
     public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder> {
@@ -69,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         public int getItemCount() {
             return rssItems.size();
         }
+
+        public void setRssItems(ArrayList<RssItem> rssItems) {
+            this.rssItems = rssItems;
+        }
     }
 
     class RetrieveFeedTask extends AsyncTask<String, Void, ArrayList<RssItem>> {
@@ -88,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayList<RssItem> rssItems) {
-            newsRecyclerAdapter = new NewsRecyclerAdapter(rssItems);
-            newsRecyclerView.setAdapter(newsRecyclerAdapter);
+            newsRecyclerAdapter.setRssItems(rssItems);
             newsRecyclerAdapter.notifyDataSetChanged();
         }
     }
