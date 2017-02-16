@@ -1,4 +1,4 @@
-package com.example.ivandokov.filterednews;
+package com.example.ivandokov.filterednews.rss;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -16,17 +16,19 @@ public class RssHandler extends DefaultHandler {
     public static final String TITLE_TAG = "title";
     public static final String LINK_TAG = "link";
     public static final String DESCRIPTION_TAG = "description";
-    private List<RssItem> rssItemList;
+    public static final String PUBLICATION_DATE_TAG = "pubDate";
+    private ArrayList<RssItem> rssItemList;
     private RssItem currentItem;
     private boolean parsingTitle;
     private boolean parsingLink;
     private boolean parsingDescription;
+    private boolean parsingPubDate;
 
     public RssHandler() {
         rssItemList = new ArrayList<RssItem>();
     }
 
-    public List<RssItem> getRssItemList() {
+    public ArrayList<RssItem> getRssItemList() {
         return rssItemList;
     }
 
@@ -36,6 +38,8 @@ public class RssHandler extends DefaultHandler {
             currentItem = new RssItem();
         } else if (qName.equals(TITLE_TAG)) {
             parsingTitle = true;
+        } else if (qName.equals(PUBLICATION_DATE_TAG)) {
+            parsingPubDate = true;
         } else if (qName.equals(LINK_TAG)) {
             parsingLink = true;
         } else if (qName.equals(DESCRIPTION_TAG)) {
@@ -54,6 +58,8 @@ public class RssHandler extends DefaultHandler {
             currentItem = null;
         } else if (qName.equals(TITLE_TAG)) {
             parsingTitle = false;
+        } else if (qName.equals(PUBLICATION_DATE_TAG)) {
+            parsingPubDate = false;
         } else if (qName.equals(LINK_TAG)) {
             parsingLink = false;
         } else if (qName.equals(DESCRIPTION_TAG)) {
@@ -70,6 +76,8 @@ public class RssHandler extends DefaultHandler {
                 currentItem.setLink(new String(ch, start, length));
             } else if (parsingDescription) {
                 currentItem.setDescription(new String(ch, start, length));
+            } else if (parsingPubDate) {
+                currentItem.setPubDate(new String(ch, start, length));
             }
         }
     }
